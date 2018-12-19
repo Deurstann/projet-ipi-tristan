@@ -109,10 +109,10 @@ int main(){
 	char buffer[5];
 	char* end;
 	int size_board;
-	printf("Entrez la taille du tableau: ");
+	printf("Entrez la la taille du tableau: ");
 	scanf("%5s",buffer);
 	size_board=strtol(buffer,&end,10);
 	play(size_board);
 	return 1;
 }
-/**
+
