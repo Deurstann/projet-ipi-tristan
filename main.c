@@ -115,3 +115,4 @@ int main(){
 	play(size_board);
 	return 1;
 }
+/**
