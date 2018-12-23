@@ -11,15 +11,24 @@
 
 void printBoard(stackToken** Board, int size_tab){
 	token tmp;
+	char* color[3];
+	int i=1;
+	color[0]="\033[30;107m";
+	color[1]="\033[97;40m";
+	color[3]="\033[0m";
 	int height;
 	int width;
 	for(height=size_tab-1;height>=0;height--){
 		for(width=0;width<size_tab;width++){
 			if(!isEmptyST(Board[width][height])){
 				tmp=peekST(Board[width][height]);
-				printf(" %s ",tmp.Name);
+				printf("%s%s%s",color[(i+width+height*size_tab)%2],tmp.Name,color[3]);
+			}
+			else{
+				printf("%s  %s",color[(i+width+height*size_tab)%2],color[3]);
 			}
 		}
+		i=1-i;
 		printf("\n");
 	}
 }
