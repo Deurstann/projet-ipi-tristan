@@ -11,26 +11,29 @@
 
 
 int isEmptyST(stackToken ST){
-	return (ST.summit==-1);
+	return (ST->summit==-1);
 }
 
-void makeST(stackToken* ST, int size){
-	ST->stackElt=(token*)malloc(size*sizeof(token));
-	ST->summit=-1;
+void makeST(stackToken* ST){
+	(*ST)=malloc(sizeof(struct PToken));
+	(*ST)->summit=-1;
 }
 
 void pushST(stackToken* ST, token tk){
-	ST->summit+=1;
-	ST->stackElt[ST->summit]=tk;
+	stackToken tmp=malloc(sizeof(struct PToken));
+	tmp->next = *ST;
+	tmp->summit=(*ST)->summit+1;
+	tmp->elm=tk;
+	*ST=tmp;
 }
 
 token peekST(stackToken ST){
-	return ST.stackElt[ST.summit];
+	return ST->elm;
 }
 
 token popST(stackToken* ST){
-	token sm=ST->stackElt[ST->summit];
-	ST->summit-=1;
+	token sm=(*ST)->elm;
+	(*ST)=(*ST)->next;
 	return sm;
 }
 

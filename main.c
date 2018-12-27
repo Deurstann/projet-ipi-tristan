@@ -9,35 +9,84 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void printBoard(stackToken** Board, int size_tab){
+void printBoard(stackToken** Board, int size_board, stackToken printed_stack){
 	token tmp;
 	char* color[3];
-	int i=1;
 	color[0]="\033[30;107m";
 	color[1]="\033[97;40m";
 	color[3]="\033[0m";
+	char* printed_color=color[0];
+	int alter_width=0;
+	int alter_height=0;
 	int height;
 	int width;
-	for(height=size_tab-1;height>=0;height--){
-		for(width=0;width<size_tab;width++){
+	printf(" ");
+	for(width=0;width<size_board;width++){
+		printf(" %c",width+97);
+	}
+	printf("\n");
+	for(height=size_board-1;height>=0;height--){
+		printf("%i ",height+1);
+		for(width=0;width<size_board;width++){
 			if(!isEmptyST(Board[width][height])){
 				tmp=peekST(Board[width][height]);
-				printf("%s%s%s",color[(i+width+height*size_tab)%2],tmp.Name,color[3]);
+				printf("%s%s%s",printed_color,tmp.Name,color[3]);
 			}
 			else{
-				printf("%s  %s",color[(i+width+height*size_tab)%2],color[3]);
+				printf("%s  %s",printed_color,color[3]);
 			}
+			alter_width=1-alter_width;
+			printed_color=color[alter_width];
 		}
-		i=1-i;
+		alter_height=1-alter_height;
+		alter_width=alter_height;
+		printed_color=color[alter_width];
+		if(height==printed_stack->summit && height!=0){
+			tmp=popST(&printed_stack);
+			printf("     %s",tmp.Name);
+		}
+		else if (printed_stack->summit==0 && height==0){
+			tmp=popST(&printed_stack);
+			printf(" %s: %s",coordtosquare(tmp.loc,size_board),tmp.Name);
+		}
 		printf("\n");
 	}
 }
 
-void play(int size_board){
+
+
+int isVictory(stackToken** Board, int size_board){
+	return 0;
+}
+
+int isValidSquare(char square[6],int size_board){
+	int let=(int) square[0];
+	char* end;
+	char snum[3];
+	int num;
+	int i=1;
+	if(let>=97 && let<97+size_board){
+		while(square[i]!='\0'){
+			snum[i-1]=square[i];
+			i+=1;
+		}
+		num=strtol(snum, &end, 10);
+		if(num >=1 && num<=size_board){
+			return 1;
+		}
+	}
+	printf("Erreur, veuillez entrez une case avec le format suivant: 'lettre''numéro'");
+	return 0;
+}
+
+int squaretocoord(){
+}
+
+
+stackToken** init_board(int size_board){
 	int height;
 	int width;
 	int switch_token=0;
-	int turn;
 	token TN;
 	token FN;
 	token CN;
@@ -50,6 +99,7 @@ void play(int size_board){
 	token DB;
 	token RB;
 	token PB;
+	stackToken empty;
 	TN.Name="TN";
 	FN.Name="FN";
 	CN.Name="CN";
@@ -62,11 +112,12 @@ void play(int size_board){
 	DB.Name="DB";
 	RB.Name="RB";
 	PB.Name="PB";
-	stackToken** Board=(stackToken**) malloc(size_board*sizeof(struct stackToken*));
+	makeST(&empty);
+	stackToken** Board=(stackToken**) malloc(size_board*sizeof(struct PToken**));
 	for(width=0;width<size_board;width++){
-		Board[width]=(stackToken*) malloc(size_board*sizeof(struct stackToken));
+		Board[width]=(stackToken*) malloc(size_board*sizeof(struct PToken*));
 		for(height=0;height<size_board;height++){
-			makeST(&Board[width][height],size_board);
+			makeST(&Board[width][height]);
 			if (switch_token==3) switch_token=0;
 			if(height==size_board-1){
 				if(width!=size_board/2-1 && width!=(int) size_board/2){
@@ -108,20 +159,51 @@ void play(int size_board){
 					switch_token=0;
 				}
 			}
+			if(!isEmptyST(Board[width][height])){
+				(Board[width][height]->elm).loc=width+size_board*height;
+			}
 		}
 	}
-	printBoard(Board,size_board);
+	printBoard(Board,size_board,empty);
+	return Board;
+	/*do{
+		system("clear");
+		printBoard(Board,size_board);
+		square=
+		do{
+			printf("C'est au tour du joueur %i, quelle case voulez-vous manipulez?")
+
+		}
+
+	}
+	while(!(winner=isVictory(Board,size_board)));*/
+}
+
+void play(stackToken** Board, int size_board){
+	int turn=0;
+	int winner;
+	char square[3];
+	char* joueur[2];
+	joueur[0]="blancs";
+	joueur[1]="noirs";
+	do{
+		printf("C'est au tours des %s, veuillez sélectionner une case:",joueur[turn%2]);
+		scanf("%3s\n",square);
+	}while(!isValidSquare(square,size_board));
+	while(!(winner=isVictory(Board,size_board)));
 }
 
 
 int main(){
-	char buffer[5];
+	char buffer[2];
 	char* end;
 	int size_board;
+	stackToken** Board;
 	printf("Entrez la la taille du tableau: ");
-	scanf("%5s",buffer);
+	scanf("%2s",buffer);
 	size_board=strtol(buffer,&end,10);
-	play(size_board);
+	Board=init_board(size_board);
+	play(Board,size_board);
 	return 1;
 }
 

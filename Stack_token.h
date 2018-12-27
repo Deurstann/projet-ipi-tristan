@@ -9,14 +9,16 @@
 #ifndef STACK_TOKEN_H_
 #define STACK_TOKEN_H_
 
-struct stackToken{
-	token* stackElt;
+typedef struct PToken* stackToken;
+
+struct PToken{
+	stackToken next;
+	token elm;
 	int summit;
 };
-typedef struct stackToken stackToken;
 
 int isEmptyST(stackToken ST);
-void makeST(stackToken* ST, int size);
+void makeST(stackToken* ST);
 void pushST(stackToken* ST,token tk);
 token peekST(stackToken ST);
 token popST(stackToken* ST);
