@@ -11,12 +11,12 @@
 
 
 int isEmptyST(stackToken ST){
-	return (ST->summit==-1);
+	return (ST->summit==0);
 }
 
 void makeST(stackToken* ST){
 	(*ST)=malloc(sizeof(struct PToken));
-	(*ST)->summit=-1;
+	(*ST)->summit=0;
 }
 
 void pushST(stackToken* ST, token tk){

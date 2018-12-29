@@ -6,6 +6,8 @@
  */
 #include "Token.h"
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 
 char* coordtosquare(int loc, int size_board){
@@ -17,4 +19,14 @@ char* coordtosquare(int loc, int size_board){
 	sprintf(snum,"%d",width);
 	strcat(res,snum);
 	return res;
+}
+
+int squaretocoord(char* square, int size_board){
+	char temp[2];
+	char* end;
+	temp[0]=square[1];
+	temp[1]=square[2];
+	int width = (int) (square[0]-'a');
+	int height=strtol(temp, &end, 10)-1;
+	return width+size_board*height;
 }

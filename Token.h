@@ -11,10 +11,12 @@
 struct token{
 	char* Name;
 	int loc;
+	int isFirstMove=1;
 };
 typedef struct token token;
 
 char* coordtosquare(int loc, int size_board);
+int squaretocoord(char* square, int size_board);
 
 
 
