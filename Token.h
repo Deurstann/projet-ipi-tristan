@@ -11,7 +11,7 @@
 struct token{
 	char* Name;
 	int loc;
-	int isFirstMove=1;
+	int isFirstMove;
 };
 typedef struct token token;
 

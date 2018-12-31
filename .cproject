@@ -35,15 +35,19 @@
                         						
                         <toolChain id="cdt.managedbuild.toolchain.gnu.cross.base.798507010" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.base">
                             							
-                            <option id="cdt.managedbuild.option.gnu.cross.prefix.1639753647" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix"/>
+                            <option id="cdt.managedbuild.option.gnu.cross.prefix.1639753647" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" useByScannerDiscovery="false"/>
                             							
-                            <option id="cdt.managedbuild.option.gnu.cross.path.1452442112" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path"/>
+                            <option id="cdt.managedbuild.option.gnu.cross.path.1452442112" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" useByScannerDiscovery="false"/>
                             							
                             <targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.697636561" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
                             							
                             <builder buildPath="${workspace_loc:/StackChess}/Default" id="cdt.managedbuild.builder.gnu.cross.1979937450" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross"/>
                             							
-                            <tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.2067410567" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
+                            <tool command="gcc" id="cdt.managedbuild.tool.gnu.cross.c.compiler.2067410567" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
+                                								
+                                <option id="gnu.c.compiler.option.warnings.extrawarn.2117812843" name="Extra warnings (-Wextra)" superClass="gnu.c.compiler.option.warnings.extrawarn" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+                                								
+                                <option id="gnu.c.compiler.option.misc.ansi.1302721556" name="Support ANSI programs (-ansi)" superClass="gnu.c.compiler.option.misc.ansi" useByScannerDiscovery="false" value="true" valueType="boolean"/>
                                 								
                                 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1052198720" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
                                 							
@@ -51,7 +55,7 @@
                             							
                             <tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1336086344" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler"/>
                             							
-                            <tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1126060973" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker">
+                            <tool command="gcc -Wall -Wextra -ansi" id="cdt.managedbuild.tool.gnu.cross.c.linker.1126060973" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker">
                                 								
                                 <inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1261353274" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
                                     									

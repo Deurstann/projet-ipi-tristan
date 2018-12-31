@@ -36,6 +36,30 @@ token popST(stackToken* ST){
 	(*ST)=(*ST)->next;
 	return sm;
 }
+int lisST(stackToken ST){
+	int res=1;
+	token curToken;
+	while(!isEmptyST(ST)){
+		curToken=popST(&ST);
+		if(curToken.Name[0]=='P') res*=2;
+		if(curToken.Name[0]=='F') res*=3;
+		if(curToken.Name[0]=='T') res*=5;
+		if(curToken.Name[0]=='D') res*=7;
+		if(curToken.Name[0]=='R') res*=11;
+		if(curToken.Name[0]=='C') res*=13;
+	}
+	return res;
+}
+void freeST(stackToken ST){
+	stackToken tmp;
+	while(!isEmptyST(ST)){
+		tmp=ST;
+		ST=ST->next;
+		free(tmp);
+	}
+}
+
+
 
 
 

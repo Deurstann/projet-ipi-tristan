@@ -22,5 +22,7 @@ void makeST(stackToken* ST);
 void pushST(stackToken* ST,token tk);
 token peekST(stackToken ST);
 token popST(stackToken* ST);
+int lisST(stackToken ST);
+void freeST(stackToken ST);
 
 #endif /* STACK_TOKEN_H_ */
