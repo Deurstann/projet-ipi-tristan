@@ -15,7 +15,11 @@
 #include <fcntl.h>
 #include <math.h>
 
-
+/*
+ @requires: Board doit être bien formé, size_board doit être la taille de Board , stackToken doit être bien formé et localisation doit être soit soit vide soit de taille 2
+ @assigns: rien
+ @ensures: Affiche le plateau avec les pions pions sur le coté si printed_stack n'est pas vide et la case sélectionnée si localisation n'est pas vide
+ */
 void printBoard(stackToken** Board, int size_board, stackToken printed_stack, char* localisation){
 	token tmp;
 	char* color[3];
@@ -63,106 +67,74 @@ void printBoard(stackToken** Board, int size_board, stackToken printed_stack, ch
 	}
 }
 
+/*
+ @requires: Board doit être bien formé,et size_board doit être la taille de Board
+ @assigns: rien
+ @ensures: retourne 1 si les blancs ont gagné, 2 si les noirs ont gagné, 3 s'il y a égalité, 0 sinon
+ */
 
 
 int isVictory(stackToken** Board, int size_board){
 	int height;
 	int width;
 	int lisToken;
-	int countTokenB=0;
-	int countTokenN=0;
-	int countFN[2];
-	countFN[0]=countFN[1]=0;
-	int countFB[2];
-	countFB[0]=countFB[1]=0;
-	int countTN=0;
-	int countTB=0;
+	int countToken[2]={0,0};
+	int countF[4]={0,0,0,0};
+	int countT[2]={0,0};
+	int isBN;
+	int isAbleToMove[2]={1,1};
 	stackToken curST;
 	for(width=0;width<size_board;width++){
 		for(height=0;height<size_board;height++){
 			curST=Board[width][height];
-			if(countTokenB<=2 && countTokenN<=2 && !isEmptyST(curST)){
+			if(countToken[0]<=2 && countToken[1]<=2 && !isEmptyST(curST)){
 				lisToken=lisST(curST);
-				while(lisToken%2==0 && peekST(curST).Name[1]=='B') {
-					countTokenB++;
-					lisToken/=2;
-				}
-				while(lisToken%2==0 && peekST(curST).Name[1]=='N'){
-					countTokenN++;
-					lisToken/=2;
-				}
-				while(lisToken%3==0 && peekST(curST).Name[1]=='B'){
-					countTokenB++;
-					countFB[abs(height%2-width%2)]++;
-					lisToken/=3;
-				}
-				while(lisToken%3==0 && peekST(curST).Name[1]=='N'){
-					countTokenN++;
-					countFB[abs(height%2-width%2)]++;
-					lisToken/=3;
-				}
-				while(lisToken%5==0 && peekST(curST).Name[1]=='B'){
-					countTokenB++;
-					countTB++;
-					lisToken/=5;
-				}
-				while(lisToken%5==0 && peekST(curST).Name[1]=='N'){
-					countTokenN++;
-					countTN++;
-					lisToken/=5;
-				}
-				while(lisToken%7==0 && peekST(curST).Name[1]=='B') {
-					countTokenB++;
-					lisToken/=7;
-				}
-				while(lisToken%7==0 && peekST(curST).Name[1]=='N'){
-					countTokenN++;
-					lisToken/=7;
-				}
-				while(lisToken%9==0 && peekST(curST).Name[1]=='B') {
-					countTokenB++;
-					lisToken/=9;
-				}
-				while(lisToken%9==0 && peekST(curST).Name[1]=='N'){
-					countTokenN++;
-					lisToken/=9;
-				}
-				while(lisToken%11==0 && peekST(curST).Name[1]=='B') {
-					countTokenB++;
-					lisToken/=11;
-				}
-				while(lisToken%11==0 && peekST(curST).Name[1]=='N'){
-					countTokenN++;
-					lisToken/=11;
-				}
-				while(lisToken%13==0 && peekST(curST).Name[1]=='B') {
-					countTokenB++;
-					lisToken/=13;
-				}
-				while(lisToken%9==0 && peekST(curST).Name[1]=='N'){
-					countTokenN++;
-					lisToken/=13;
+				while(lisToken!=1){
+					isBN=peekST(curST).Name[1]=='B';
+					countToken[isBN]++;
+					if(lisToken%2==0) lisToken/=2;
+					else if(lisToken%3==0){
+						countF[2*isBN+abs(height%2-width%2)]++;
+						lisToken/=3;
+					}
+					else if(lisToken%5==0) {
+						countT[isBN]++;
+						lisToken/=5;
+					}
+					else if(lisToken%7==0) lisToken/=7;
+					else if(lisToken%9==0) lisToken/=9;
+					else if(lisToken%11==0) lisToken/=11;
+					else if(lisToken%13==0) lisToken/=13;
 				}
 			}
 		}
 	}
-	if(countTokenB==2 && countTokenN==2){
-		if((countFB[0] && countFB[1]) || (countFB[0] && countTB) || (countFB[1] && countTB)){
-			if((countFB[0] && countFB[1]) || (countFB[0] && countTB) || (countFB[1] && countTB)){
-				return 3;
-			}
+	if(countToken[0]==2){
+		if((countF[0] && countF[1]) || (countF[0] && countT[0]) || (countF[1] && countT[0])){
+			isAbleToMove[0]=0;
 		}
 	}
-	if (countTokenB==1 && countTokenN==1){
-		if((countFB[0] && countFN[1]) || (countFB[1] && countFN[0])){
-			return 3;
+	if(countToken[0]==3){
+		if(countF[0] && countF[1] && countT[0]) isAbleToMove[0]=0;
+	}
+	if(countToken[1]==2){
+		if((countF[2] && countF[3]) || (countF[2] && countT[1]) || (countF[3] && countT[1])){
+			isAbleToMove[1]=0;
 		}
 	}
-	if(countTokenN==0) return 1;
-	if(countTokenB==0) return 2;
+	if(countToken[1]==3){
+		if(countF[2] && countF[3] && countT[1]) isAbleToMove[1]=0;
+	}
+	if(!isAbleToMove[0] && ! isAbleToMove[1]) return 3;
+	if(countToken[0]==0) return 2;
+	if(countToken[1]==0) return 1;
 	return 0;
 }
-
+/*
+ @requires: square doit être bien formé et de taille 3, size_board doit être entre 6 et 26 inclus et test doit être bien soit vide, soit de taille 3
+ @assigns: rien
+ @ensures: retourne 1 si square correspond bien à une coordonnée du tableau et s'il n'est pas égale à test qui correspond à la case de départ séléctionné le cas échéant, sinon 0
+ */
 int isValidSquare(char square[3],int size_board, char* test){
 	int let=(int) square[0];
 	char* end;
@@ -189,21 +161,33 @@ int isValidSquare(char square[3],int size_board, char* test){
 	return 0;
 }
 
+/*
+ @requires: ST doit être bien formé, et turn doit être positif
+ @assigns: rien
+ @ensures: retourne 1 si ST est non vide et si elle ne contient pas des pions qui n'appartiennent pas au joueur dont c'est le tour, 0 sinon
+ */
+
 int accessSquare(stackToken ST, int turn){
 	token tmp;
 	if(isEmptyST(ST)){
 		printf("La case sélectionnée est vide, veuillez en choisir une autre.\n");
-		sleep(10);
+		sleep(3);
 		return 0;
 	}
 	tmp=peekST(ST);
 	if((tmp.Name[1]=='B' && turn%2==0) || (tmp.Name[1]=='N' && turn%2==1)){
 		printf("Vous ne pouvez pas bougez une case contenant des pièces de l'adversaire, veuillez en choisir une autre.\n");
-		sleep(10);
+		sleep(3);
 		return 0;
 	}
 	return 1;
 }
+
+/*
+ @requires: Start, end et Board doivent être bien formés, nbToMove et locD doivent être positifs et size_board doit correspondre à la taille de Board
+ @assigns: rien
+ @ensures: retourne 1 le mouvement choisi par le joueur est valide, 0 sinon
+ */
 
 int isValidMove(stackToken start, stackToken end, int nbToMove, int locD, stackToken** Board, int size_board){
 	int k;
@@ -230,7 +214,7 @@ int isValidMove(stackToken start, stackToken end, int nbToMove, int locD, stackT
 	j=(widthEnd-widthStart)/abs(widthEnd-widthStart);
 	if(nbToMove<=end->summit && peekST(start).Name[1]!=peekST(end).Name[1]){
 		printf("Déplacement impossible: le nombre de pièces adverse sur la case d'arrivée est supérieur au nombre de pièces que vous voulez déplacer.\n");
-		sleep(5);
+		sleep(3);
 		return 0;
 	}
 	for(k=0;k<nbToMove;k++){
@@ -249,59 +233,13 @@ int isValidMove(stackToken start, stackToken end, int nbToMove, int locD, stackT
 		}
 	}
 	if(Tokenlist%17==0){
-		if(heightEnd-heightStart==2){
-			if(widthEnd-widthStart==1){
-				if((!isEmptyST(Board[widthStart+1][heightStart])&&!isEmptyST(Board[widthStart+1][heightStart+1])) || (!isEmptyST(Board[widthStart][heightStart+1]) && !isEmptyST(Board[widthStart][heightStart+2]))){
-					isPossibleC=0;
-				}
-			}
-			else if(widthEnd-widthStart==-1){
-				if((!isEmptyST(Board[widthStart-1][heightStart])&&!isEmptyST(Board[widthStart-1][heightStart+1])) || (!isEmptyST(Board[widthStart][heightStart+1]) && !isEmptyST(Board[widthStart][heightStart+2]))){
-					isPossibleC=0;
-				}
-			}
+		if(!(abs(heightEnd-heightStart)==2 && abs(widthEnd-widthStart)==1) && !(abs(heightEnd-heightStart)==1 && abs(widthEnd-widthStart)==2)){
+			isPossibleC=0;
 		}
-		else if(heightEnd-heightStart==-2){
-			if(widthEnd-widthStart==1){
-				if((!isEmptyST(Board[widthStart+1][heightStart])&&!isEmptyST(Board[widthStart+1][heightStart-1])) || (!isEmptyST(Board[widthStart][heightStart-1]) && !isEmptyST(Board[widthStart][heightStart-2]))){
-					isPossibleC=0;
-				}
-			}
-			else if(widthEnd-widthStart==-1){
-				if((!isEmptyST(Board[widthStart-1][heightStart])&&!isEmptyST(Board[widthStart-1][heightStart-1])) || (!isEmptyST(Board[widthStart][heightStart-1]) && !isEmptyST(Board[widthStart][heightStart-2]))){
-					isPossibleC=0;
-				}
-			}
-		}
-		else if(heightEnd-heightStart==1){
-			if(widthEnd-widthStart==2){
-				if((!isEmptyST(Board[widthStart][heightStart+1])&&!isEmptyST(Board[widthStart+1][heightStart+1])) || (!isEmptyST(Board[widthStart+1][heightStart]) && !isEmptyST(Board[widthStart+2][heightStart]))){
-					isPossibleC=0;
-				}
-			}
-			else if(widthEnd-widthStart==-2){
-				if((!isEmptyST(Board[widthStart][heightStart+1])&&!isEmptyST(Board[widthStart-1][heightStart+1])) || (!isEmptyST(Board[widthStart-1][heightStart]) && !isEmptyST(Board[widthStart-2][heightStart]))){
-					isPossibleC=0;
-				}
-			}
-		}
-		else if(heightEnd-heightStart==-1){
-			if(widthEnd-widthStart==2){
-				if((!isEmptyST(Board[widthStart][heightStart-1])&&!isEmptyST(Board[widthStart+1][heightStart-1])) || (!isEmptyST(Board[widthStart+1][heightStart]) && !isEmptyST(Board[widthStart+2][heightStart]))){
-					isPossibleC=0;
-				}
-			}
-			else if(widthEnd-widthStart==-2){
-				if((!isEmptyST(Board[widthStart][heightStart-1])&&!isEmptyST(Board[widthStart-1][heightStart-1])) || (!isEmptyST(Board[widthStart-1][heightStart]) && !isEmptyST(Board[widthStart-2][heightStart]))){
-					isPossibleC=0;
-				}
-			}
-		}
-		else isPossibleC=0;
 	}
 	if (!isPossibleC){
 		printf("Déplacement impossible: un Cavalier dans la pile bloque le déplacement.\n");
-		sleep(5);
+		sleep(3);
 		return 0;
 	}
 	if(isPossibleC && nbCvl>=(nbToMove*2)) return 1;
@@ -318,13 +256,13 @@ int isValidMove(stackToken start, stackToken end, int nbToMove, int locD, stackT
 	}
 	if(!isPossibleP){
 		printf("Déplacement impossible: un Pion dans la pile bloque le déplacement.\n");
-		sleep(5);
+		sleep(3);
 		return 0;
 	}
 	if(Tokenlist%13==0){
 		if(abs(widthEnd-widthStart)!=1 || abs(heightEnd-heightStart)!=1){
 			printf("Déplacement impossible: un Roi dans la pile bloque le déplacement.\n");
-			sleep(10);
+			sleep(3);
 			return 0;
 		}
 	}
@@ -348,7 +286,7 @@ int isValidMove(stackToken start, stackToken end, int nbToMove, int locD, stackT
 	}
 	if(!isPossibleD){
 		printf("Déplacement impossible: une Dame dans la pile bloque le déplacement.\n");
-		sleep(10);
+		sleep(3);
 		return 0;
 	}
 	if(Tokenlist%5==0){
@@ -361,7 +299,7 @@ int isValidMove(stackToken start, stackToken end, int nbToMove, int locD, stackT
 	}
 	if(!isPossibleF){
 		printf("Déplacement impossible: un Fou dans la pile bloque le déplacement.\n");
-		sleep(10);
+		sleep(3);
 		return 0;
 	}
 	if(Tokenlist%7==0){
@@ -378,11 +316,17 @@ int isValidMove(stackToken start, stackToken end, int nbToMove, int locD, stackT
 	}
 	if(!isPossibleT){
 		printf("Déplacement impossible: une Tour dans la pile bloque le déplacement.\n");
-		sleep(10);
+		sleep(3);
 		return 0;
 	}
 	return 1;
 }
+
+/*
+ @requires: Start et end doivent être bien formés, nbToMove, locD, heightD doivent être positifs et size_board doit correspondre à la taille du plateau
+ @assigns: start et end
+ @ensures: déplace un nombre de pions égal à nbToMove depuis start vers end en gardant l'ordre et en supprimant les pions de end s'ils appartiennent à l'adversaire
+ */
 
 
 void moveST(stackToken* start, stackToken* end, int heightD, int locD, int nbToMove, int size_board){
@@ -421,7 +365,11 @@ void moveST(stackToken* start, stackToken* end, int heightD, int locD, int nbToM
 	}
 }
 
-
+/*
+ @requires: size_board doit être positif
+ @assigns: nothing
+ @ensures: créé le plateau de départ dont la taille sera size_board
+ */
 
 stackToken** init_board(int size_board){
 	int height;
@@ -651,14 +599,12 @@ void play(stackToken** Board, int size_board, int turn){
 	char strMove[3];
 	char choice;
 	char temp[2];
-	char* joueur[2];
+	char joueur[2][7]={"noirs","blancs"};
 	char* end;
 	stackToken empty;
 	stackToken curST;
 	stackToken desST;
 	makeST(&empty);
-	joueur[0]="noirs";
-	joueur[1]="blancs";
 	do{
 		do{
 			fix=system("clear");
