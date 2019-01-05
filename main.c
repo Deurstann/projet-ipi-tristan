@@ -86,9 +86,12 @@ int isVictory(stackToken** Board, int size_board){
 	stackToken curST;
 	for(width=0;width<size_board;width++){
 		for(height=0;height<size_board;height++){
+			/*Ici, on se sert de la décomposition unique d'un nombre en puissance de nombres premiers pour caractériser les pions et leur nombre*/
 			curST=Board[width][height];
 			if(countToken[0]<=2 && countToken[1]<=2 && !isEmptyST(curST)){
 				lisToken=lisST(curST);
+				/*Cette boucle se termine lorsque lisToken=1.
+				  Cela arrivera toujours car lisToken est un multiple des nombres premiers de 2 à 13 et qu'on le divise à chaque fois par l'entier correspondant*/
 				while(lisToken!=1){
 					isBN=peekST(curST).Name[1]=='B';
 					countToken[isBN]++;
@@ -142,6 +145,7 @@ int isValidSquare(char square[3],int size_board, char* test){
 	int num;
 	int i=1;
 	if(let>=97 && let<97+size_board){
+		/*Cette boucle se termine lorsque l'on arrive à la fin de square. Cela est toujours possible car square est au maximum de taille 3 et i augmente à chaque fois*/
 		while(square[i]!='\0'){
 			snum[i-1]=square[i];
 			i+=1;
@@ -360,6 +364,7 @@ void moveST(stackToken* start, stackToken* end, int heightD, int locD, int nbToM
 			pushST(&inter,tmp->elm);
 			tmp=tmp->next;
 		}
+		/*Ici la boucle se termine lorsque inter est vide, ce qui arrivera toujours car on lui enlève un élément à chaque fois*/
 		while(!isEmptyST(inter)) pushST(end,popST(&inter));
 		*start=tmp;
 	}
@@ -455,6 +460,12 @@ stackToken** init_board(int size_board){
 	return Board;
 }
 
+/*
+ @requires: nothing
+ @assigns: nothing
+ @ensures: lit le fichier de sauvegarde et enregistre la taille du terrain et le tour. En cas d'erreur, affiche un message et ferme le programme
+ */
+
 int* getParam(){
 	FILE* fp;
 	char tmp[4];
@@ -481,6 +492,12 @@ int* getParam(){
 	return res;
 }
 
+/*
+ @requires: size_board doit être positif, fichier save présent dans le répertoire courant et non altéré
+ @assigns: nothing
+ @ensures: lit le fichier de sauvegarde et créer le plateau correspondant. En cas d'erreur, renvoit un message d'erreur et ferme le programme
+ */
+
 stackToken** init_saved_board(int size_board){
 	FILE* fp=fopen("save","r");
 	char ntoken[2];
@@ -499,9 +516,11 @@ stackToken** init_saved_board(int size_board){
 		for(height=0;height<size_board;height++){
 			makeST(&Board[width][height]);
 			i=0;
+			/*Ici on reset le contenu de tmp, ce qui permet de le remplir à nouveau*/
 			memset(tmp,0,4*size_board);
 			tmp=fgets(tmp,4*size_board,fp);
 			if(tmp[0]=='\n') Board[width][height]=empty;
+			/*Cette boucle se termine lorsque l'on arrive à la fin de la ligne ce qui arrivera toujours car i augmente à chaque fois*/
 			while(tmp[i]!='\n'){
 				ntoken[0]=tmp[i];
 				ntoken[1]=tmp[i+1];
@@ -535,6 +554,12 @@ stackToken** init_saved_board(int size_board){
 	return Board;
 }
 
+/*
+ @requires: rs de taille paire (sans compter le '\0') et size correspondant à la taille de rs
+ @assigns: nothing
+ @ensures: inverse l'ordre d'apparition des noms de pion dans rs
+ */
+
 char* reverseToken(char* rs, int size){
 	int i=0;
 	char tmp[2];
@@ -546,6 +571,12 @@ char* reverseToken(char* rs, int size){
 	}
 	return res;
 }
+
+/*
+ @requires: Board tableau bien formé, size_board correspondant à la taille de Board et turn positif
+ @assigns: fichier save dans le répertoire courant
+ @ensures: créer le fichier save (ou le modifie) contenant la taille du tableau, le tour actuel et tous les pions présent sur le tableau
+ */
 
 void saveGame(stackToken** Board, int turn, int size_board){
 	int width;
@@ -562,8 +593,10 @@ void saveGame(stackToken** Board, int turn, int size_board){
 	fprintf(fp,"%d\n",turn);
 	for(width=0;width<size_board;width++){
 		for(height=0;height<size_board;height++){
+			/*Ici on reset le contenu de tmp, ce qui permet de le remplir à nouveau*/
 			memset(tmp,0,2*size_board);
 			size=-1;
+			/*Cette boucle se termine lorsque la pile correspondante sera vide ce qui arrivera toujours car on lui enlève un élément à chaque fois*/
 			while(!isEmptyST(Board[width][height])){
 				cur=popST(&Board[width][height]);
 				if(cur.Name[0]=='P' && cur.isFirstMove==1){
@@ -582,6 +615,11 @@ void saveGame(stackToken** Board, int turn, int size_board){
 	exit(0);
 }
 
+/*
+ @requires: Board bien formé, size_board correspondant à la taille de Board et turn positif
+ @assigns: Board
+ @ensures: gère tout le déroulement du jeux, en cas de victoire ou d'égalité, affiche un message et ferme le programme
+ */
 
 void play(stackToken** Board, int size_board, int turn){
 	int winner;
@@ -593,7 +631,6 @@ void play(stackToken** Board, int size_board, int turn){
 	int widthD;
 	int Move;
 	int nbToMove;
-	int fix;
 	char square[4];
 	char squareD[4];
 	char strMove[3];
@@ -605,41 +642,59 @@ void play(stackToken** Board, int size_board, int turn){
 	stackToken curST;
 	stackToken desST;
 	makeST(&empty);
+	/*Cette boucle se termine lorsqu'il y a victoire ou égalité*/
 	do{
+		/*Cette boucle se termine quand le mouvement demandé par le joueur est possible sachant qu'il y aura toujours un mouvement possible*/
 		do{
-			fix=system("clear");
+			if(system("clear")==-1){
+				printf("Erreur: Impossible d'éffacer l'écran!");
+			}
 			printBoard(Board,size_board,empty,"");
 			Move=0;
+			/*Cette boucle se termine quand le joueur entre une case valide*/
 			do{
 				printf("C'est au tours des %s, veuillez sélectionner une case:",joueur[turn%2]);
-				fix=scanf("%3s",square);
+				if(scanf("%3s",square)==-1){
+					printf("Erreur: Impossible de lire les caractères entrés dans le terminal!");
+				}
 				printf("\n");
 			} while(!isValidSquare(square,size_board, "test"));
 			loc=squaretocoord(square,size_board);
 			height=loc/size_board;
 			width=loc%size_board;
 			curST=Board[width][height];
-			fix=system("clear");
+			if(system("clear")==-1){
+				printf("Erreur: Impossible d'éffacer l'écran!");
+			}
 			printBoard(Board, size_board, curST, square);
+			/*Cette boucle se termine quand un joueur entre un caractère parmi (c,d,a,s)*/
 			do{
 				printf("Très bien, que voulez vous faire maintenant?\n");
 				printf("Entrez c pour changer de case, d pour faire un déplacement, s pour sauvegarder et quitter et a pour abandonner:");
-				fix=scanf("%2s",temp);
+				if(scanf("%2s",temp)==-1){
+					printf("Erreur: Impossible de lire les caractères entrés dans le terminal!");
+				}
 				printf("\n");
 				choice=temp[0];
 			} while(choice != 'c' && choice != 'd' && choice != 'a' && choice != 's');
 			if(choice=='d'){
 				if (accessSquare(Board[width][height],turn)){
+					/*Cette boucle se termine quand le joueur entre un nombre de pièce compris entre 1 et la taille de la pile*/
 					do{
 						printf("Entrez le nombre de pièces que vous voulez déplacer (entre 1 et %i):",curST->summit);
-						fix=scanf("%2s",strMove);
+						if(scanf("%2s",strMove)==-1){
+							printf("Erreur: Impossible de lire les caractères entrés dans le terminal!");
+						}
 						printf("\n");
 						nbToMove=strtol(strMove,&end,10);
 						if(nbToMove<=0 || nbToMove>curST->summit) printf("Erreur: le nombre que vous avez saisi n'est pas valide.\n");
 					} while(nbToMove<=0 || nbToMove>curST->summit);
+					/*Cette boucle se termine quand le joueur entre une case valide différente de la case de départ*/
 					do{
 						printf("Entrez la case de déstination:");
-						fix=scanf("%3s",squareD);
+						if(scanf("%3s",squareD)==-1){
+							printf("Erreur: Impossible de lire les caractères entrés dans le terminal!");
+						}
 						printf("\n");
 					} while(!isValidSquare(squareD,size_board,square));
 					locD=squaretocoord(squareD,size_board);
@@ -684,34 +739,42 @@ int main(){
 	char* end;
 	int size_board;
 	int* param;
-	int fix;
 	stackToken** Board;
-	fix=system("clear");
+	if(system("clear")==-1){
+		printf("Erreur: Impossible d'éffacer l'écran!");
+	}
 	printSMenu();
+	/*Cette boucle se termine lorsque le joueur rentre q*/
 	do{
+		/*Cette boucle se termine lorsque le joueur rentre un caractère parmi (n,c,m,q)*/
 		do{
 			printf("Bienvenue dans StackChess! Que voulez vous faire:");
-			fix=scanf("%1s",choice);
+			if(scanf("%1s",choice)==-1){
+				printf("Erreur: Impossible de lire les caractères entrés dans le terminal!");
+			}
 		} while(choice[0] != 'n' && choice[0] != 'c' && choice[0] != 'm' && choice[0] != 'q');
-			if(choice[0] == 'n'){
+		if(choice[0] == 'n'){
+			/*Cette boucle se termine lorsque le joueur entre un nombre compris entre 6 et 26 inclus*/
 			do{
 				printf("Entrez la taille du tableau: ");
-				fix=scanf("%2s",buffer);
+				if(scanf("%2s",buffer)==1){
+					printf("Erreur: Impossible de lire les caractères entrés dans le terminal!");
+				}
 				size_board=strtol(buffer,&end,10);
 			} while(size_board<6 || size_board>26);
 			Board=init_board(size_board);
 			play(Board,size_board,1);
-			}
-			if(choice[0] == 'c'){
-				param=getParam();
-				Board=init_saved_board(param[0]);
-				play(Board,param[0],param[1]);
-			}
-			if(choice[0] == 'm'){
-				printMan();
-			}
+		}
+		if(choice[0] == 'c'){
+			param=getParam();
+			Board=init_saved_board(param[0]);
+			play(Board,param[0],param[1]);
+		}
+		if(choice[0] == 'm'){
+			printMan();
+		}
 	}while(choice[0] != 'q');
 	printf("\nA bientot dans StackChess!\n");
-	return 1;
+	return 0;
 }
 
