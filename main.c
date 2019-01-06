@@ -85,7 +85,7 @@ int isVictory(stackToken** Board, int size_board){
 		for(height=0;height<size_board;height++){
 			/*Ici, on se sert de la décomposition unique d'un nombre en puissance de nombres premiers pour caractériser les pions et leur nombre*/
 			curST=Board[width][height];
-			if(countToken[0]<=2 && countToken[1]<=2 && !isEmptyST(curST)){
+			if((countToken[0]<=5 || countToken[1]<=5) && !isEmptyST(curST)){
 				lisToken=lisST(curST);
 				/*Cette boucle se termine lorsque lisToken=1.
 				  Cela arrivera toujours car lisToken est un multiple des nombres premiers de 2 à 13 et qu'on le divise à chaque fois par l'entier correspondant*/
@@ -338,7 +338,8 @@ void moveST(stackToken* start, stackToken* end, int heightD, int locD, int nbToM
 		for(k=0;k<nbToMove;k++){
 			if(tmp->elm.Name[0]=='P'){
 				tmp->elm.isFirstMove=0;
-				if((heightD==0 && tmp->elm.Name[1]=='N') || (heightD==size_board-1 && tmp->elm.Name[1]=='B')) tmp->elm.Name[0]='D';
+				if(heightD==0 && tmp->elm.Name[1]=='N') tmp->elm.Name="DN";
+				else if (heightD==size_board-1 && tmp->elm.Name[1]=='B') tmp->elm.Name="DB";
 			}
 			tmp->elm.loc=locD;
 			tmp->summit=nbToMove-k;
@@ -355,7 +356,8 @@ void moveST(stackToken* start, stackToken* end, int heightD, int locD, int nbToM
 		for(k=0;k<nbToMove;k++){
 			if(tmp->elm.Name[0]=='P'){
 				tmp->elm.isFirstMove=0;
-				if((heightD==0 && tmp->elm.Name[1]=='N') || (heightD==size_board-1 && tmp->elm.Name[1]=='B')) tmp->elm.Name[0]='D';
+				if(heightD==0 && tmp->elm.Name[1]=='N') tmp->elm.Name="DN";
+				else if (heightD==size_board-1 && tmp->elm.Name[1]=='B') tmp->elm.Name="DB";
 			}
 			tmp->elm.loc=locD;
 			pushST(&inter,tmp->elm);
@@ -560,7 +562,7 @@ stackToken** init_saved_board(int size_board){
 char* reverseToken(char* rs, int size){
 	int i=0;
 	char tmp[2];
-	char* res=malloc(1+size*sizeof(char));
+	char* res=calloc(1+size,1);
 	for(i=size;i>=1;i-=2){
 		tmp[0]=rs[i-1];
 		tmp[1]=rs[i];
@@ -745,7 +747,7 @@ int main(){
 	do{
 		/*Cette boucle se termine lorsque le joueur rentre un caractère parmi (n,c,m,q)*/
 		do{
-			printf("Bienvenue dans StackChess! Que voulez vous faire:");
+			printf("Bienvenue dans StackChess! Que voulez-vous faire:");
 			if(scanf("%1s",choice)==-1){
 				printf("Erreur: Impossible de lire les caractères entrés dans le terminal!");
 			}
