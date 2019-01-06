@@ -22,10 +22,7 @@
  */
 void printBoard(stackToken** Board, int size_board, stackToken printed_stack, char* localisation){
 	token tmp;
-	char* color[3];
-	color[0]="\033[30;107m";
-	color[1]="\033[97;40m";
-	color[3]="\033[0m";
+	char color[3][12]={"\033[30;107m","\033[97;40m","\033[0m"};
 	char* printed_color=color[0];
 	int alter_width=0;
 	int alter_height=0;
@@ -41,10 +38,10 @@ void printBoard(stackToken** Board, int size_board, stackToken printed_stack, ch
 		for(width=0;width<size_board;width++){
 			if(!isEmptyST(Board[width][height])){
 				tmp=peekST(Board[width][height]);
-				printf("%s%s%s",printed_color,tmp.Name,color[3]);
+				printf("%s%s%s",printed_color,tmp.Name,color[2]);
 			}
 			else{
-				printf("%s  %s",printed_color,color[3]);
+				printf("%s  %s",printed_color,color[2]);
 			}
 			alter_width=1-alter_width;
 			printed_color=color[alter_width];
@@ -63,7 +60,7 @@ void printBoard(stackToken** Board, int size_board, stackToken printed_stack, ch
 		else if (isEmptyST(printed_stack) && height==0 && strcmp(localisation,"")){
 			printf(" %s: ", localisation);
 		}
-		printf("\n");
+		printf("%s\n",color[2]);
 	}
 }
 
@@ -740,7 +737,7 @@ int main(){
 	int size_board;
 	int* param;
 	stackToken** Board;
-	if(system("clear")==-1){
+	if(system("clear\n")==-1){
 		printf("Erreur: Impossible d'éffacer l'écran!");
 	}
 	printSMenu();
@@ -757,7 +754,7 @@ int main(){
 			/*Cette boucle se termine lorsque le joueur entre un nombre compris entre 6 et 26 inclus*/
 			do{
 				printf("Entrez la taille du tableau: ");
-				if(scanf("%2s",buffer)==1){
+				if(scanf("%2s",buffer)==-1){
 					printf("Erreur: Impossible de lire les caractères entrés dans le terminal!");
 				}
 				size_board=strtol(buffer,&end,10);

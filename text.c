@@ -41,6 +41,7 @@ void printMan(){
 	printf("   - Lorsque l'on déplace la pile on peut soit déplacer tout ses éléments, soit une partie.\n");
 	printf("   - Pour pouvoir déplacer une pile, il faut que le déplacement soit valide pour toutes les pièces s'y trouvant.\n");
 	printf("   - Les cavaliers peuvent porter des pièces. Par exemple, si la pile possède un nombre 2n de pièces\n");
+	printf("   - Si un pions arrive à l'éxtrémité opposé, il devient une dame même si il fait parti d'une pile.\n");
 	printf("     et s'il y a un nombre supérieur à n de cavaliers, alors on peut considérer la pile comme une pile de cavaliers.\n");
 	printf("   - On ne peut pas déplacer de pièces par dessus d'autre pièces, sauf dans le cas des cavalier.\n");
 	printf("   - Pour prendre des pièces à l'adversaire il faut que la taille de la pile que l'on déplace soit\n");
